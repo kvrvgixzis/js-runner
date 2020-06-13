@@ -22,7 +22,7 @@ let isJump = false;
 function draw() {
     heroPosY += gravity;
 
-    collisionCheck();
+    checkHeroYPos();
 
     ctx.fillStyle = "lightgray";
     ctx.fillRect(0, 0, cvs.clientWidth, cvs.clientHeight);
@@ -35,16 +35,23 @@ function action(e) {
     e.code === 'Space' && jump();
 }
 
-function collisionCheck() {
-    if (heroPosY > worldHeight - heroSz) {
-        heroPosY = worldHeight - heroSz;
+function checkHeroYPos() {
+    const bottomBorder = worldHeight - heroSz;
+    const topBorder = worldHeight - 180;
+
+    if (heroPosY > bottomBorder) {
+        heroPosY = bottomBorder;
         isJump = false;
+    }
+
+    if (heroPosY < topBorder) {
+        heroPosY = topBorder;
     }
 }
 
 function jump() {
     const jumpPower = 20;
-    const jumpTime = 300;
+    const jumpTime = 500;
 
     if (!isJump) {
         isJump = true;
