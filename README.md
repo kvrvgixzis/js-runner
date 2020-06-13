@@ -1,2 +1,5 @@
 # js-runner
-first game on js
+> My first game on js
+
+## [TRY](http://kvrvgixzis.github.io/js-runner)
+
