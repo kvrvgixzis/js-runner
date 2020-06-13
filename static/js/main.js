@@ -1,25 +1,25 @@
 const cvs = document.getElementById("canvas");
 const ctx = cvs.getContext("2d");
 
-const width = 500;
-const height = 500;
-ctx.canvas.width  = width;
-ctx.canvas.height = height;
+// World
+const worldWidth = 500;
+const worldHeight = 500;
+ctx.canvas.width  = worldWidth;
+ctx.canvas.height = worldHeight;
 
+// Hero
 const hero = new Image();
-hero.src = "static/img/hero.png";
-
-let heroPozX = 100;
-let heroPosY = height - heroSz;
 const heroSz = 50;
+hero.src = "static/img/hero.png";
+let heroPozX = 100;
+let heroPosY = worldHeight - heroSz;
 
+// Physics
 let speed = 0;
 let gravity = 10;
-const jumpPower = 20;
-const jumpTime = 300;
+let isJump = false;
 
 function draw() {
-    heroPozX += speed;
     heroPosY += gravity;
 
     collisionCheck();
@@ -28,30 +28,32 @@ function draw() {
     ctx.fillRect(0, 0, cvs.clientWidth, cvs.clientHeight);
     ctx.drawImage(hero, heroPozX, heroPosY);
 
-
-    if (heroPozX + hero.width <= width) {
-        requestAnimationFrame(draw);
-    }
+    requestAnimationFrame(draw);
 }
 
 function action(e) {
-    if (e.code === 'Space') {
-        console.log("sdfsf")
-        jump();
-    }
+    e.code === 'Space' && jump();
 }
 
 function collisionCheck() {
-    if (heroPosY > height - heroSz) {
-        heroPosY = height - heroSz;
+    if (heroPosY > worldHeight - heroSz) {
+        heroPosY = worldHeight - heroSz;
+        isJump = false;
     }
 }
 
 function jump() {
-    gravity -= jumpPower;
-    setTimeout(() => {
-        gravity += jumpPower;
-    }, jumpTime);
+    const jumpPower = 20;
+    const jumpTime = 300;
+
+    if (!isJump) {
+        isJump = true;
+        gravity -= jumpPower;
+
+        setTimeout(() => {
+            gravity += jumpPower;
+        }, jumpTime);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
