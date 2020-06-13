@@ -65,7 +65,10 @@ function jump() {
 
 document.addEventListener("DOMContentLoaded", () => {
     const jumpBtn = document.querySelector(".jump-btn");
+
     draw();
+
+    // Listeners
     document.addEventListener('keyup', e => action(e));
     jumpBtn.addEventListener('click', () => jump())
 });
