@@ -5,37 +5,49 @@ let isStart = true;
 
 let score = 0;
 
-// World
+// world
 const worldWidth = 300;
 const worldHeight = 250;
-const fgHeight = 25;
 ctx.canvas.width  = worldWidth;
 ctx.canvas.height = worldHeight;
 
-// Hero
+// fg
+const fgSz = 25;
+const fgPosY = worldHeight - 25;
+let fg = [];
+for (let i = 0; i < 24; i++) {
+    fg.push({
+        x: 25 * i,
+        y: fgPosY,
+        color: i % 2 == 0 ? "silver" : "darkgray"
+    })
+}
+
+// hero
 const hero = new Image();
 const heroSz = 50;
 let heroPosX = 20;
-let heroPosY = worldHeight - heroSz - fgHeight;
+let heroPosY = worldHeight - heroSz - fgSz;
 hero.src = "static/img/hero.png";
 
-// Physics
-const bottomBorder = worldHeight - heroSz - fgHeight;
+// physics
+const bottomBorder = worldHeight - heroSz - fgSz;
 const topBorder = worldHeight - 170;
-const jumpTime = 600;
+let jumpTime = 600;
 let jumpPower = 25;
 let speed = 4;
 let gravity = 12;
 let isJump = false;
 
-// Obstacles
+// obstacles
 let obstacles = [{
-        w: heroSz,
-        h: heroSz,
-        x: worldWidth * 2,
-        y: worldHeight - heroSz - fgHeight,
-    },
+    w: heroSz,
+    h: heroSz,
+    x: worldWidth * 2,
+    y: worldHeight - heroSz - fgSz,
+},
 ];
+
 
 function draw() {
     heroPosY += gravity;
@@ -48,26 +60,40 @@ function draw() {
     ctx.fillRect(0, 0, worldWidth, worldHeight);
 
     //fg
-    ctx.fillStyle = "silver";
-    ctx.fillRect(0, worldHeight - 25, worldWidth, 25);
+    fg.forEach((e, i, _) => {
+        e.x -= speed;
+        ctx.fillStyle = e.color;
+        ctx.fillRect(e.x, e.y, fgSz, fgSz);
+
+        if (e.x + fgSz <= 0) {
+            fg.push({
+                x: fg[fg.length - 1].x + fgSz,
+                y: fgPosY,
+                color: e.color
+            });
+            fg.splice(i, 1);
+        }
+    });
+    
 
     // spawn obstacles
-    ctx.fillStyle = "darkgray";
     obstacles.forEach((e, i, _) => {
         const spawnPoint = 50;
 
+        ctx.fillStyle = "gray";
         ctx.fillRect(e.x, e.y, e.w, e.h);
         e.x -= speed;
 
         // spawn
         if (e.x <= spawnPoint && e.x >= spawnPoint - speed) {
-            const gap = Math.floor(Math.random() * Math.floor(heroSz * 10)) + speed * 2;
+            const gap = Math.floor(Math.random() * ((speed * 50) - speed * 2) + speed * 2) + 20;
+            // const gap = Math.floor(Math.random() * Math.floor(heroSz * 10)) + speed * 5;
             if (worldWidth + gap - obstacles[obstacles.length - 1].x >= heroSz * 4) {
                 obstacles.push({
                     w: heroSz,
                     h: heroSz,
                     x: worldWidth + gap,
-                    y: worldHeight - heroSz - fgHeight,
+                    y: worldHeight - heroSz - fgSz,
                 })
             }
         }
@@ -94,10 +120,12 @@ function draw() {
 }
 
 function speedUp() {
-    if (score % 10 === 0 && score) {
+    if (score % 3 === 0 && score && speed <= 11) {
         speed += .5;
-        // gravity += speed * 2;
-        // jumpPower += speed * 2;
+        if (jumpTime >= 250) {
+           jumpTime -= speed * 2;
+        }
+        jumpPower += 1;
     }
 }
 
