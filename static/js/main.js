@@ -38,6 +38,7 @@ function draw() {
     heroPosY += gravity;
 
     checkCollision();
+    beautifyJumpBtn();
 
     ctx.fillStyle = "lightgray";
     ctx.fillRect(0, 0, cvs.clientWidth, cvs.clientHeight);
@@ -119,7 +120,7 @@ function checkCollision() {
 
 function jump() {
     !isStart && location.reload();
-    
+
     if (!isJump) {
         isJump = true;
         gravity -= jumpPower;
@@ -130,12 +131,25 @@ function jump() {
     }
 }
 
+function beautifyJumpBtn() {
+    const jumpBtn = document.querySelector(".jump-btn");
+    if (isJump) {
+        jumpBtn.style.background = "silver";
+        jumpBtn.style.color = "gray";
+        jumpBtn.style.margin = "3px";
+    } else {
+        jumpBtn.style.background = "lightgray"
+        jumpBtn.style.color = "#212121";
+        jumpBtn.style.margin = "0";
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     const jumpBtn = document.querySelector(".jump-btn");
 
     draw();
 
     // Listeners
-    document.addEventListener('keyup', e => action(e));
+    document.addEventListener('keydown', e => action(e));
     jumpBtn.addEventListener('click', () => jump())
 });

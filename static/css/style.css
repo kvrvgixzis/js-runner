@@ -35,3 +35,8 @@ body {
     height: 100px;
     background-color: lightgray;
 }
+
+.jump-btn:active, 
+.jump-btn:focus {
+    outline: none;
+}
