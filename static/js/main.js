@@ -8,19 +8,22 @@ let score = 0;
 // World
 const worldWidth = 300;
 const worldHeight = 250;
+const fgHeight = 25;
 ctx.canvas.width  = worldWidth;
 ctx.canvas.height = worldHeight;
 
 // Hero
 const hero = new Image();
-hero.src = "static/img/hero.png";
 const heroSz = 50;
 let heroPosX = 20;
-let heroPosY = worldHeight - heroSz;
+let heroPosY = worldHeight - heroSz - fgHeight;
+hero.src = "static/img/hero.png";
 
 // Physics
-let jumpPower = 20;
-let jumpTime = 600;
+const bottomBorder = worldHeight - heroSz - fgHeight;
+const topBorder = worldHeight - 170;
+const jumpTime = 600;
+let jumpPower = 25;
 let speed = 4;
 let gravity = 12;
 let isJump = false;
@@ -30,7 +33,7 @@ let obstacles = [{
         w: heroSz,
         h: heroSz,
         x: worldWidth * 2,
-        y: worldHeight - heroSz,
+        y: worldHeight - heroSz - fgHeight,
     },
 ];
 
@@ -40,19 +43,23 @@ function draw() {
     checkCollision();
     beautifyJumpBtn();
 
+    // bg
     ctx.fillStyle = "lightgray";
-    ctx.fillRect(0, 0, cvs.clientWidth, cvs.clientHeight);
+    ctx.fillRect(0, 0, worldWidth, worldHeight);
 
+    //fg
+    ctx.fillStyle = "silver";
+    ctx.fillRect(0, worldHeight - 25, worldWidth, 25);
+
+    // spawn obstacles
     ctx.fillStyle = "darkgray";
-
     obstacles.forEach((e, i, _) => {
         const spawnPoint = 50;
 
         ctx.fillRect(e.x, e.y, e.w, e.h);
-
         e.x -= speed;
 
-        // Spawn
+        // spawn
         if (e.x <= spawnPoint && e.x >= spawnPoint - speed) {
             const gap = Math.floor(Math.random() * Math.floor(heroSz * 10)) + speed * 2;
             if (worldWidth + gap - obstacles[obstacles.length - 1].x >= heroSz * 4) {
@@ -60,44 +67,60 @@ function draw() {
                     w: heroSz,
                     h: heroSz,
                     x: worldWidth + gap,
-                    y: worldHeight - heroSz,
+                    y: worldHeight - heroSz - fgHeight,
                 })
             }
         }
 
-        // Check crash
+        // check obstacle collision
         if (heroPosX + heroSz - 5 >= e.x &&
             heroPosX + 5 <= e.x + heroSz &&
             heroPosY + heroSz - 5 >= e.y) {
-            const jumpBtn = document.querySelector(".jump-btn");
-
-            jumpBtn.style.color = "red";
-            jumpBtn.innerHTML = "retry";
-
-            isStart = false;
+            gameOver();
         }
 
-        // Remove old obstacle
+        // obstacle out of world
         if (e.x + heroSz <= 0) {
-            const scoreSpan = document.querySelector("#score");
-
-            score++;
-            scoreSpan.innerHTML = score;
             obstacles.splice(i, 1);
 
-            // Speed up
-            if (score % 10 === 0 && score) {
-                speed += .5;
-                gravity += speed * 2;
-                jumpPower += speed * 2;
-            }
+            scoreUp();
+            speedUp();
         }
 
     });
     
     ctx.drawImage(hero, heroPosX, heroPosY);
-
     isStart && requestAnimationFrame(draw);
+}
+
+function speedUp() {
+    if (score % 10 === 0 && score) {
+        speed += .5;
+        // gravity += speed * 2;
+        // jumpPower += speed * 2;
+    }
+}
+
+function scoreUp() {
+    const scoreSpan = document.querySelector("#score");
+    score++;
+    scoreSpan.innerHTML = score;
+}
+
+function gameOver() {
+    const jumpBtn = document.querySelector(".jump-btn");
+    const highScoreSpan = document.querySelector("#high-score");
+    const highScore = localStorage.getItem("highScore");
+
+    if (score > highScore) {
+        highScoreSpan.innerHTML = score;
+        localStorage.setItem("highScore", score);
+    }
+
+    jumpBtn.style.color = "red";
+    jumpBtn.innerHTML = "retry";
+
+    isStart = false;
 }
 
 function action(e) {
@@ -105,9 +128,6 @@ function action(e) {
 }
 
 function checkCollision() {
-    const bottomBorder = worldHeight - heroSz;
-    const topBorder = worldHeight - 180;
-
     if (heroPosY > bottomBorder) {
         heroPosY = bottomBorder;
         isJump = false;
@@ -136,7 +156,7 @@ function beautifyJumpBtn() {
     if (isJump) {
         jumpBtn.style.background = "silver";
         jumpBtn.style.color = "gray";
-        jumpBtn.style.margin = "3px";
+        jumpBtn.style.margin = "0 3px";
     } else {
         jumpBtn.style.background = "lightgray"
         jumpBtn.style.color = "#212121";
@@ -144,12 +164,21 @@ function beautifyJumpBtn() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function main() {
     const jumpBtn = document.querySelector(".jump-btn");
+    const highScoreSpan = document.querySelector("#high-score");
+    const highScore = localStorage.getItem("highScore");
+
+    highScoreSpan.innerHTML = highScore || 0;
+
+    jumpBtn.innerHTML = "jump";
 
     draw();
 
-    // Listeners
     document.addEventListener('keydown', e => action(e));
     jumpBtn.addEventListener('click', () => jump())
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    main();
 });

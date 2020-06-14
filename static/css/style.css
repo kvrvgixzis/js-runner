@@ -28,6 +28,7 @@ body {
 
 #canvas {
     width: 100%;
+    margin-bottom: 14px;
 }
 
 .jump-btn {
@@ -39,4 +40,8 @@ body {
 .jump-btn:active, 
 .jump-btn:focus {
     outline: none;
+}
+
+.high-score {
+    margin-top: 14px;
 }
