@@ -3,6 +3,8 @@ const ctx = cvs.getContext("2d");
 
 let isStart = true;
 
+let score = 0;
+
 // World
 const worldWidth = 300;
 const worldHeight = 250;
@@ -17,17 +19,17 @@ let heroPosX = 20;
 let heroPosY = worldHeight - heroSz;
 
 // Physics
-const jumpPower = 20;
-const jumpTime = 500;
+let jumpPower = 20;
+let jumpTime = 600;
 let speed = 4;
-let gravity = 10;
+let gravity = 12;
 let isJump = false;
 
-
+// Obstacles
 let obstacles = [{
         w: heroSz,
         h: heroSz,
-        x: worldWidth,
+        x: worldWidth * 2,
         y: worldHeight - heroSz,
     },
 ];
@@ -49,8 +51,9 @@ function draw() {
 
         e.x -= speed;
 
+        // Spawn
         if (e.x <= spawnPoint && e.x >= spawnPoint - speed) {
-            const gap = Math.floor(Math.random() * Math.floor(heroSz * 5));
+            const gap = Math.floor(Math.random() * Math.floor(heroSz * 10)) + speed * 2;
             if (worldWidth + gap - obstacles[obstacles.length - 1].x >= heroSz * 4) {
                 obstacles.push({
                     w: heroSz,
@@ -61,15 +64,34 @@ function draw() {
             }
         }
 
+        // Check crash
         if (heroPosX + heroSz - 5 >= e.x &&
             heroPosX + 5 <= e.x + heroSz &&
             heroPosY + heroSz - 5 >= e.y) {
+            const jumpBtn = document.querySelector(".jump-btn");
+
+            jumpBtn.style.color = "red";
+            jumpBtn.innerHTML = "retry";
+
             isStart = false;
         }
 
-        if (e.x + 50 <= 0) {
+        // Remove old obstacle
+        if (e.x + heroSz <= 0) {
+            const scoreSpan = document.querySelector("#score");
+
+            score++;
+            scoreSpan.innerHTML = score;
             obstacles.splice(i, 1);
+
+            // Speed up
+            if (score % 10 === 0 && score) {
+                speed += .5;
+                gravity += speed * 2;
+                jumpPower += speed * 2;
+            }
         }
+
     });
     
     ctx.drawImage(hero, heroPosX, heroPosY);
@@ -96,6 +118,8 @@ function checkCollision() {
 }
 
 function jump() {
+    !isStart && location.reload();
+    
     if (!isJump) {
         isJump = true;
         gravity -= jumpPower;
