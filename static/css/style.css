@@ -10,13 +10,13 @@ body {
 
 .container {
     display: flex;
-    width: 300px;
+    width: 80%;
     margin: 0 auto;
     flex-direction: column;
 }
 
 #canvas {
-    /* border: 1px solid black; */
+    width: 100%;
 }
 
 .jump-btn {
