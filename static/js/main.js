@@ -2,6 +2,8 @@ const cvs = document.getElementById("canvas");
 const ctx = cvs.getContext("2d");
 
 let isStart = true;
+let isReverse = false;
+let isJump = false;
 
 let score = 0;
 
@@ -11,34 +13,40 @@ const worldHeight = 250;
 ctx.canvas.width  = worldWidth;
 ctx.canvas.height = worldHeight;
 
+//bg
+const bgColor = "lightgray";
+
 // fg
-const fgBorderSz = 1.5;
-const fgSz = 25;
-const fgPosY = worldHeight - 25;
+const fgBorderSz = 0;
+const fgSz = 20;
+const fgPosY = worldHeight - fgSz;
+const lightFgColor = "silver";
+const darkFgColor = "darkgray";
+
 let fg = [];
-for (let i = 0; i < 24; i++) {
+for (let i = 0; i < 34; i++) {
     fg.push({
-        x: 25 * i,
+        x: fgSz * i,
         y: fgPosY,
-        color: i % 2 == 0 ? "silver" : "darkgray"
+        color: i % 2 == 0 ? lightFgColor : darkFgColor,
     })
 }
 
 // hero
 const hero = new Image();
 const heroSz = 50;
-let heroPosX = 20;
+let heroPosX = 50;
 let heroPosY = worldHeight - heroSz - fgSz;
 hero.src = "static/img/hero.png";
 
 // physics
-const bottomBorder = worldHeight - heroSz - fgSz;
-const topBorder = worldHeight - 170;
+let jumpBorder = 80;
+let bottomBorder = worldHeight - heroSz - fgSz;
+let topBorder = fgSz + jumpBorder;
 let jumpTime = 520;
 let jumpPower = 27;
-let speed = 6;
 let gravity = 16;
-let isJump = false;
+let speed = 6;
 
 // obstacles
 let obstacles = [{
@@ -56,18 +64,33 @@ function frame() {
     checkCollision();
     beautifyJumpBtn();
 
-    // bg
-    ctx.fillStyle = "lightgray";
-    ctx.fillRect(0, 0, worldWidth, worldHeight);
+    drawBg();
+    drawFg();
+    drawObstacles();
+    
+    ctx.drawImage(hero, heroPosX, heroPosY);
 
-    //fg
+    isStart && requestAnimationFrame(frame);
+}
+
+function drawBg() {
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, worldWidth, worldHeight);
+}
+
+function drawFg() {
     fg.forEach((e, i, _) => {
         e.x -= speed;
-        ctx.fillStyle = e.color;
+
+        // bottom fg
+        ctx.fillStyle = isReverse ? bgColor : e.color;
         ctx.fillRect(e.x, e.y, fgSz, fgSz);
+
+        // top fg
+        ctx.fillStyle = isReverse ? e.color : bgColor;
         ctx.fillRect(e.x, 0, fgSz, fgSz);
 
-        if (e.x + fgSz <= 0) {
+        if (e.x + fgSz <= -fgSz) {
             fg.push({
                 x: fg[fg.length - 1].x + fgSz,
                 y: fgPosY,
@@ -76,18 +99,21 @@ function frame() {
             fg.splice(i, 1);
         }
     });
+
     ctx.fillStyle = "gray";
     ctx.fillRect(0, worldHeight - fgSz, worldWidth, fgBorderSz);
     ctx.fillRect(0, fgSz - fgBorderSz, worldWidth, fgBorderSz);
-    
+}
 
-    // spawn obstacles
+function drawObstacles() {
     obstacles.forEach((e, i, _) => {
         const spawnPoint = 50;
+        const posY = isReverse ? fgSz : e.y;
+
+        e.x -= speed;
 
         ctx.fillStyle = "gray";
-        ctx.fillRect(e.x, e.y, e.w, e.h);
-        e.x -= speed;
+        ctx.fillRect(e.x, posY, e.w, e.h);
 
         // spawn
         if (e.x <= spawnPoint && e.x >= spawnPoint - speed) {
@@ -104,26 +130,31 @@ function frame() {
         }
 
         // check obstacle collision
-        if (heroPosX + heroSz - 5 >= e.x &&
+        if (isReverse) {
+            if (heroPosX + heroSz - 5 >= e.x &&
+            heroPosX + 5 <= e.x + heroSz &&
+            heroPosY - 5 <= posY + heroSz) {
+            gameOver();
+            }
+        } else {
+            if (heroPosX + heroSz - 5 >= e.x &&
             heroPosX + 5 <= e.x + heroSz &&
             heroPosY + heroSz - 5 >= e.y) {
             gameOver();
+            }
         }
-
+        
         // obstacle out of world
-        if (e.x + heroSz <= 0) {
-            obstacles.splice(i, 1);
-
+        if (e.x + heroSz <= -heroSz) {
             scoreUp();
             speedUp();
         }
-
+        
+        if (e.x + heroSz <= -heroSz) {
+            obstacles.splice(i, 1);
+            changeGravity();
+        }
     });
-    
-    // draw hero
-    ctx.drawImage(hero, heroPosX, heroPosY);
-
-    isStart && requestAnimationFrame(frame);
 }
 
 function speedUp() {
@@ -140,6 +171,25 @@ function scoreUp() {
     const scoreSpan = document.querySelector("#score");
     score++;
     scoreSpan.innerHTML = score;
+}
+
+function changeGravity() {
+    if (!isJump && score % 20 === 0) {
+        obstacles.map(e => {e.x += heroSz * 3})
+
+        isJump = true;
+        isReverse = !isReverse;
+        gravity = -gravity;
+        jumpPower = -jumpPower;
+
+        if (gravity < 0) {
+            topBorder -= jumpBorder;
+            bottomBorder -= jumpBorder;
+        } else {
+            topBorder += jumpBorder;
+            bottomBorder += jumpBorder;
+        }
+    }
 }
 
 function gameOver() {
@@ -160,16 +210,25 @@ function gameOver() {
 
 function action(e) {
     e.code === 'Space' && jump();
+    // e.code === 'Enter' && changeGravity();
 }
 
 function checkCollision() {
     if (heroPosY > bottomBorder) {
-        heroPosY = bottomBorder;
-        isJump = false;
+        if (isReverse) {
+            heroPosY = bottomBorder;    
+        } else {
+            heroPosY = bottomBorder;
+            isJump = false;
+        }
     }
-
     if (heroPosY < topBorder) {
-        heroPosY = topBorder;
+        if (isReverse) {
+            heroPosY = topBorder;
+            isJump = false;
+        } else {
+            heroPosY = topBorder;
+        }
     }
 }
 
