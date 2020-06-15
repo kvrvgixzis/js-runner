@@ -20,7 +20,7 @@ const bgColor = "lightgray";
 
 // fg
 const fgBorderSz = 0;
-const fgSz = 20;
+const fgSz = 32;
 const fgPosY = worldHeight - fgSz;
 const lightFgColor = "silver";
 const darkFgColor = "darkgray";
@@ -45,10 +45,10 @@ hero.src = "static/img/hero.png";
 let jumpBorder = 70;
 let bottomBorder = worldHeight - heroSz - fgSz;
 let topBorder = fgSz + jumpBorder;
-let jumpTime = 520;
+let jumpTime = 550;
 let jumpPower = 24;
 let gravity = 16;
-let speed = 6;
+let speed = 5;
 
 // obstacles
 let obstacles = [{
@@ -132,16 +132,17 @@ function drawObstacles() {
         }
 
         // check obstacle collision
+        const collisionBorder = 10;
         if (isReverse) {
-            if (heroPosX + heroSz - 5 >= e.x &&
-                heroPosX + 5 <= e.x + heroSz &&
-                heroPosY - 5 <= posY + heroSz) {
+            if (heroPosX + heroSz - collisionBorder >= e.x &&
+                heroPosX + collisionBorder <= e.x + heroSz &&
+                heroPosY + collisionBorder <= posY + heroSz) {
                 gameOver();
             }
         } else {
-            if (heroPosX + heroSz - 5 >= e.x &&
-                heroPosX + 5 <= e.x + heroSz &&
-                heroPosY + heroSz + 5 >= e.y) {
+            if (heroPosX + heroSz - collisionBorder >= e.x &&
+                heroPosX + collisionBorder <= e.x + heroSz &&
+                heroPosY + heroSz - collisionBorder >= e.y) {
                 gameOver();
             }
         }
@@ -158,11 +159,11 @@ function drawObstacles() {
 }
 
 function speedUp() {
-    if (score % 10 === 0 && score && speed <= 11) {
-        speed += .5;
-        if (jumpTime >= 250) {
-           jumpTime -= speed * 2;
-        }
+    if (score % 5 === 0 && score && speed <= 9) {
+        speed += .3;
+        console.log(`speed: ${speed}`);
+        console.log(`jump time: ${jumpTime}`);
+        jumpTime += isReverse ? 20 : -20;
         jumpPower += 1;
     }
 }
