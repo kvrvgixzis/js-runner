@@ -42,11 +42,11 @@ let heroPosY = worldHeight - heroSz - fgSz;
 hero.src = "static/img/hero.png";
 
 // physics
-let jumpBorder = 80;
+let jumpBorder = 70;
 let bottomBorder = worldHeight - heroSz - fgSz;
 let topBorder = fgSz + jumpBorder;
 let jumpTime = 520;
-let jumpPower = 27;
+let jumpPower = 24;
 let gravity = 16;
 let speed = 6;
 
@@ -141,7 +141,7 @@ function drawObstacles() {
         } else {
             if (heroPosX + heroSz - 5 >= e.x &&
                 heroPosX + 5 <= e.x + heroSz &&
-                heroPosY + heroSz - 5 >= e.y) {
+                heroPosY + heroSz + 5 >= e.y) {
                 gameOver();
             }
         }
