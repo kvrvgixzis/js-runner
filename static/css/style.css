@@ -16,7 +16,7 @@ body {
 .container {
     display: flex;
     width: 94%;
-    max-width: 500px;
+    max-width: 400px;
     margin: 0 auto;
     flex-direction: column;
 }
@@ -33,7 +33,7 @@ body {
 
 .jump-btn {
     border: none;
-    height: 100px;
+    height: 150px;
     background-color: lightgray;
 }
 

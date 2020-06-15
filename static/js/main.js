@@ -12,6 +12,7 @@ ctx.canvas.width  = worldWidth;
 ctx.canvas.height = worldHeight;
 
 // fg
+const fgBorderSz = 1.5;
 const fgSz = 25;
 const fgPosY = worldHeight - 25;
 let fg = [];
@@ -33,10 +34,10 @@ hero.src = "static/img/hero.png";
 // physics
 const bottomBorder = worldHeight - heroSz - fgSz;
 const topBorder = worldHeight - 170;
-let jumpTime = 600;
-let jumpPower = 25;
-let speed = 4;
-let gravity = 12;
+let jumpTime = 520;
+let jumpPower = 27;
+let speed = 6;
+let gravity = 16;
 let isJump = false;
 
 // obstacles
@@ -49,7 +50,7 @@ let obstacles = [{
 ];
 
 
-function draw() {
+function frame() {
     heroPosY += gravity;
 
     checkCollision();
@@ -64,6 +65,7 @@ function draw() {
         e.x -= speed;
         ctx.fillStyle = e.color;
         ctx.fillRect(e.x, e.y, fgSz, fgSz);
+        ctx.fillRect(e.x, 0, fgSz, fgSz);
 
         if (e.x + fgSz <= 0) {
             fg.push({
@@ -74,6 +76,9 @@ function draw() {
             fg.splice(i, 1);
         }
     });
+    ctx.fillStyle = "gray";
+    ctx.fillRect(0, worldHeight - fgSz, worldWidth, fgBorderSz);
+    ctx.fillRect(0, fgSz - fgBorderSz, worldWidth, fgBorderSz);
     
 
     // spawn obstacles
@@ -115,12 +120,14 @@ function draw() {
 
     });
     
+    // draw hero
     ctx.drawImage(hero, heroPosX, heroPosY);
-    isStart && requestAnimationFrame(draw);
+
+    isStart && requestAnimationFrame(frame);
 }
 
 function speedUp() {
-    if (score % 3 === 0 && score && speed <= 11) {
+    if (score % 10 === 0 && score && speed <= 11) {
         speed += .5;
         if (jumpTime >= 250) {
            jumpTime -= speed * 2;
@@ -201,7 +208,7 @@ function main() {
 
     jumpBtn.innerHTML = "jump";
 
-    draw();
+    frame();
 
     document.addEventListener('keydown', e => action(e));
     jumpBtn.addEventListener('click', () => jump())
