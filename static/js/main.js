@@ -107,7 +107,7 @@ function drawFg() {
 
 function drawObstacles() {
     obstacles.forEach((e, i, _) => {
-        const spawnPoint = 50;
+        const spawnPoint = heroSz + heroSz;
         const posY = isReverse ? fgSz : e.y;
 
         e.x -= speed;
@@ -123,7 +123,7 @@ function drawObstacles() {
                 obstacles.push({
                     w: heroSz,
                     h: heroSz,
-                    x: worldWidth + gap,
+                    x: worldWidth + gap + heroSz,
                     y: worldHeight - heroSz - fgSz,
                 })
             }
@@ -149,7 +149,7 @@ function drawObstacles() {
             scoreUp();
             speedUp();
         }
-        
+
         if (e.x + heroSz <= -heroSz) {
             obstacles.splice(i, 1);
             changeGravity();
