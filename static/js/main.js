@@ -1,6 +1,8 @@
 const cvs = document.getElementById("canvas");
 const ctx = cvs.getContext("2d");
 
+const scoreSpan = document.querySelector("#score");
+
 let isStart = true;
 let isReverse = false;
 let isJump = false;
@@ -107,7 +109,7 @@ function drawFg() {
 
 function drawObstacles() {
     obstacles.forEach((e, i, _) => {
-        const spawnPoint = heroSz + heroSz;
+        const spawnPoint = heroSz * 2;
         const posY = isReverse ? fgSz : e.y;
 
         e.x -= speed;
@@ -117,13 +119,13 @@ function drawObstacles() {
 
         // spawn
         if (e.x <= spawnPoint && e.x >= spawnPoint - speed) {
-            const gap = Math.floor(Math.random() * ((speed * 50) - speed * 2) + speed * 2) + 20;
-            // const gap = Math.floor(Math.random() * Math.floor(heroSz * 10)) + speed * 5;
+            const gap = Math.floor(Math.random() * ((speed * 50) - speed * 2) + speed * 2) + heroSz * 2;
+            
             if (worldWidth + gap - obstacles[obstacles.length - 1].x >= heroSz * 4) {
                 obstacles.push({
                     w: heroSz,
                     h: heroSz,
-                    x: worldWidth + gap + heroSz,
+                    x: worldWidth + gap,
                     y: worldHeight - heroSz - fgSz,
                 })
             }
@@ -132,26 +134,24 @@ function drawObstacles() {
         // check obstacle collision
         if (isReverse) {
             if (heroPosX + heroSz - 5 >= e.x &&
-            heroPosX + 5 <= e.x + heroSz &&
-            heroPosY - 5 <= posY + heroSz) {
-            gameOver();
+                heroPosX + 5 <= e.x + heroSz &&
+                heroPosY - 5 <= posY + heroSz) {
+                gameOver();
             }
         } else {
             if (heroPosX + heroSz - 5 >= e.x &&
-            heroPosX + 5 <= e.x + heroSz &&
-            heroPosY + heroSz - 5 >= e.y) {
-            gameOver();
+                heroPosX + 5 <= e.x + heroSz &&
+                heroPosY + heroSz - 5 >= e.y) {
+                gameOver();
             }
         }
         
         // obstacle out of world
-        if (e.x + heroSz <= -heroSz) {
+        if (e.x + heroSz <= -heroSz / 2) {
+            obstacles.splice(i, 1);
+
             scoreUp();
             speedUp();
-        }
-
-        if (e.x + heroSz <= -heroSz) {
-            obstacles.splice(i, 1);
             changeGravity();
         }
     });
@@ -168,14 +168,13 @@ function speedUp() {
 }
 
 function scoreUp() {
-    const scoreSpan = document.querySelector("#score");
     score++;
     scoreSpan.innerHTML = score;
 }
 
 function changeGravity() {
     if (!isJump && score % 20 === 0) {
-        obstacles.map(e => {e.x += heroSz * 3})
+        obstacles.map(e => {e.x += heroSz * 5})
 
         isJump = true;
         isReverse = !isReverse;
