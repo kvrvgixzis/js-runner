@@ -30,8 +30,8 @@ for (let i = 0; i < 34; i++) {
     fg.push({
         x: fgSz * i,
         y: fgPosY,
-        color: i % 2 == 0 ? lightFgColor : darkFgColor,
-    })
+        color: i % 2 === 0 ? lightFgColor : darkFgColor,
+    });
 }
 
 // hero
@@ -63,14 +63,16 @@ function frame() {
 
     checkWorldCollision();
     beautifyJumpBtn();
-
     drawBg();
     drawFg();
     drawObstacles();
-    
-    ctx.drawImage(hero, heroPosX, heroPosY);
+    drawHero();
 
     isStart && requestAnimationFrame(frame);
+}
+
+function drawHero() {
+    ctx.drawImage(hero, heroPosX, heroPosY);
 }
 
 function drawBg() {
@@ -79,7 +81,7 @@ function drawBg() {
 }
 
 function drawFg() {
-    fg.forEach((e, i, _) => {
+    fg.forEach((e, i) => {
         e.x -= speed;
 
         // bottom fg
@@ -102,7 +104,7 @@ function drawFg() {
 }
 
 function drawObstacles() {
-    obstacles.forEach((e, i, _) => {
+    obstacles.forEach((e, i) => {
         const posY = isReverse ? fgSz : e.y;
 
         e.x -= speed;
@@ -111,7 +113,7 @@ function drawObstacles() {
 
         createNewObstacle(e);
         checkObstacleCollision(e, posY);
-        removeOldsObstacle(e, i);        
+        removeOldObstacle(e, i);        
     });
 }
 
@@ -127,7 +129,7 @@ function createNewObstacle(e) {
                 h: heroSz,
                 x: worldWidth + gap,
                 y: worldHeight - heroSz - fgSz,
-            })
+            });
         }
     }
 }
@@ -150,7 +152,7 @@ function checkObstacleCollision(e, posY) {
     }
 }
 
-function removeOldsObstacle(e, i) {
+function removeOldObstacle(e, i) {
     // obstacle out of world
     if (e.x + heroSz <= -heroSz / 2) {
         obstacles.splice(i, 1);
@@ -176,7 +178,7 @@ function scoreUp() {
 
 function changeGravity() {
     if (!isJump && score % 20 === 0) {
-        obstacles.map(e => {e.x += heroSz * 5})
+        obstacles.map(e => {e.x += heroSz * 5;});
 
         isJump = true;
         isReverse = !isReverse;
@@ -241,7 +243,7 @@ function beautifyJumpBtn() {
         jumpBtn.style.color = "gray";
         jumpBtn.style.margin = "0 3px";
     } else {
-        jumpBtn.style.background = "lightgray"
+        jumpBtn.style.background = "lightgray";
         jumpBtn.style.color = "#212121";
         jumpBtn.style.margin = "0";
     }
