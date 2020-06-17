@@ -1,8 +1,6 @@
 const d = document;
-
 const cvs = d.querySelector("#canvas");
 const ctx = cvs.getContext("2d");
-
 const scoreSpan = d.querySelector("#score");
 const jumpBtn = d.querySelector(".jump-btn");
 const highScoreSpan = d.querySelector("#high-score");
@@ -11,13 +9,11 @@ const highScore = localStorage.getItem("highScore");
 let isStart = true;
 let isReverse = false;
 let isJump = false;
-
 let score = 0;
 
 // world
 const worldWidth = 300;
 const worldHeight = 250;
-
 ctx.canvas.width  = worldWidth;
 ctx.canvas.height = worldHeight;
 
@@ -25,13 +21,10 @@ ctx.canvas.height = worldHeight;
 const bgColor = "lightgray";
 
 // fg
-const fgBorderSz = 0;
 const fgSz = 32;
 const fgPosY = worldHeight - fgSz;
-
 const lightFgColor = "silver";
 const darkFgColor = "darkgray";
-
 let fg = [];
 for (let i = 0; i < 34; i++) {
     fg.push({
@@ -44,18 +37,14 @@ for (let i = 0; i < 34; i++) {
 // hero
 const hero = new Image();
 const heroSz = 50;
-
 let heroPosX = 50;
 let heroPosY = worldHeight - heroSz - fgSz;
-
 hero.src = "static/img/hero.png";
 
 // physics
 let jumpBorder = 57.5;
-
 let bottomBorder = worldHeight - heroSz - fgSz;
 let topBorder = fgSz + jumpBorder;
-
 let jumpTime = 550;
 let jumpPower = 24;
 let gravity = 16;
@@ -67,14 +56,12 @@ let obstacles = [{
     h: heroSz,
     x: worldWidth * 2,
     y: worldHeight - heroSz - fgSz,
-},
-];
-
+}];
 
 function frame() {
     heroPosY += gravity;
 
-    checkCollision();
+    checkWorldCollision();
     beautifyJumpBtn();
 
     drawBg();
@@ -112,68 +99,71 @@ function drawFg() {
             fg.splice(i, 1);
         }
     });
-
-    ctx.fillStyle = "gray";
-    ctx.fillRect(0, worldHeight - fgSz, worldWidth, fgBorderSz);
-    ctx.fillRect(0, fgSz - fgBorderSz, worldWidth, fgBorderSz);
 }
 
 function drawObstacles() {
     obstacles.forEach((e, i, _) => {
-        const spawnPoint = heroSz * 2;
         const posY = isReverse ? fgSz : e.y;
 
         e.x -= speed;
-
         ctx.fillStyle = "gray";
         ctx.fillRect(e.x, posY, e.w, e.h);
 
-        // spawn
-        if (e.x <= spawnPoint && e.x >= spawnPoint - speed) {
-            const gap = Math.floor(Math.random() * ((speed * 50) - speed * 2) + speed * 2) + heroSz * 2;
-            
-            if (worldWidth + gap - obstacles[obstacles.length - 1].x >= heroSz * 4) {
-                obstacles.push({
-                    w: heroSz,
-                    h: heroSz,
-                    x: worldWidth + gap,
-                    y: worldHeight - heroSz - fgSz,
-                })
-            }
-        }
-
-        // check obstacle collision
-        const collisionBorder = 10;
-        if (isReverse) {
-            if (heroPosX + heroSz - collisionBorder >= e.x &&
-                heroPosX + collisionBorder <= e.x + heroSz &&
-                heroPosY + collisionBorder <= posY + heroSz) {
-                gameOver();
-            }
-        } else {
-            if (heroPosX + heroSz - collisionBorder >= e.x &&
-                heroPosX + collisionBorder <= e.x + heroSz &&
-                heroPosY + heroSz - collisionBorder >= e.y) {
-                gameOver();
-            }
-        }
-        
-        // obstacle out of world
-        if (e.x + heroSz <= -heroSz / 2) {
-            obstacles.splice(i, 1);
-
-            scoreUp();
-            speedUp();
-            changeGravity();
-        }
+        createNewObstacle(e);
+        checkObstacleCollision(e, posY);
+        removeOldsObstacle(e, i);        
     });
+}
+
+function createNewObstacle(e) {
+    const spawnPoint = heroSz * 2;
+
+    if (e.x <= spawnPoint && e.x >= spawnPoint - speed) {
+        const gap = Math.floor(Math.random() * ((speed * 50) - speed * 2) + speed * 2) + heroSz * 2;
+        
+        if (worldWidth + gap - obstacles[obstacles.length - 1].x >= heroSz * 4) {
+            obstacles.push({
+                w: heroSz,
+                h: heroSz,
+                x: worldWidth + gap,
+                y: worldHeight - heroSz - fgSz,
+            })
+        }
+    }
+}
+
+function checkObstacleCollision(e, posY) {
+    const collisionBorder = 10;
+
+    if (isReverse) {
+        if (heroPosX + heroSz - collisionBorder >= e.x &&
+            heroPosX + collisionBorder <= e.x + heroSz &&
+            heroPosY + collisionBorder <= posY + heroSz) {
+            gameOver();
+        }
+    } else {
+        if (heroPosX + heroSz - collisionBorder >= e.x &&
+            heroPosX + collisionBorder <= e.x + heroSz &&
+            heroPosY + heroSz - collisionBorder >= e.y) {
+            gameOver();
+        }
+    }
+}
+
+function removeOldsObstacle(e, i) {
+    // obstacle out of world
+    if (e.x + heroSz <= -heroSz / 2) {
+        obstacles.splice(i, 1);
+
+        scoreUp();
+        speedUp();
+        changeGravity();
+    }
 }
 
 function speedUp() {
     if (score % 5 === 0 && score && speed <= 9) {
         speed += .3;
-        console.log(`speed: ${speed}`);
-        console.log(`jump time: ${jumpTime}`);
         jumpTime += isReverse ? 20 : -20;
         jumpPower += 1;
     }
@@ -208,18 +198,12 @@ function gameOver() {
         highScoreSpan.innerHTML = score;
         localStorage.setItem("highScore", score);
     }
-
     jumpBtn.style.color = "red";
     jumpBtn.innerHTML = "retry";
-
     isStart = false;
 }
 
-function action(e) {
-    e.code === 'Space' && jump();
-}
-
-function checkCollision() {
+function checkWorldCollision() {
     if (heroPosY > bottomBorder) {
         if (isReverse) {
             heroPosY = bottomBorder;    
@@ -270,8 +254,8 @@ function main() {
 
     frame();
 
-    d.addEventListener('keydown', e => action(e));
-    jumpBtn.addEventListener('click', () => jump())
+    d.addEventListener('keydown', e => { e.code === 'Space' && jump(); });
+    jumpBtn.addEventListener('click', () => jump());
 }
 
 d.addEventListener("DOMContentLoaded", () => {
