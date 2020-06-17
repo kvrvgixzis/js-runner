@@ -1,7 +1,12 @@
-const cvs = document.getElementById("canvas");
+const d = document;
+
+const cvs = d.querySelector("#canvas");
 const ctx = cvs.getContext("2d");
 
-const scoreSpan = document.querySelector("#score");
+const scoreSpan = d.querySelector("#score");
+const jumpBtn = d.querySelector(".jump-btn");
+const highScoreSpan = d.querySelector("#high-score");
+const highScore = localStorage.getItem("highScore");
 
 let isStart = true;
 let isReverse = false;
@@ -12,6 +17,7 @@ let score = 0;
 // world
 const worldWidth = 300;
 const worldHeight = 250;
+
 ctx.canvas.width  = worldWidth;
 ctx.canvas.height = worldHeight;
 
@@ -22,6 +28,7 @@ const bgColor = "lightgray";
 const fgBorderSz = 0;
 const fgSz = 32;
 const fgPosY = worldHeight - fgSz;
+
 const lightFgColor = "silver";
 const darkFgColor = "darkgray";
 
@@ -37,14 +44,18 @@ for (let i = 0; i < 34; i++) {
 // hero
 const hero = new Image();
 const heroSz = 50;
+
 let heroPosX = 50;
 let heroPosY = worldHeight - heroSz - fgSz;
+
 hero.src = "static/img/hero.png";
 
 // physics
-let jumpBorder = 70;
+let jumpBorder = 57.5;
+
 let bottomBorder = worldHeight - heroSz - fgSz;
 let topBorder = fgSz + jumpBorder;
+
 let jumpTime = 550;
 let jumpPower = 24;
 let gravity = 16;
@@ -193,10 +204,6 @@ function changeGravity() {
 }
 
 function gameOver() {
-    const jumpBtn = document.querySelector(".jump-btn");
-    const highScoreSpan = document.querySelector("#high-score");
-    const highScore = localStorage.getItem("highScore");
-
     if (score > highScore) {
         highScoreSpan.innerHTML = score;
         localStorage.setItem("highScore", score);
@@ -210,7 +217,6 @@ function gameOver() {
 
 function action(e) {
     e.code === 'Space' && jump();
-    // e.code === 'Enter' && changeGravity();
 }
 
 function checkCollision() {
@@ -246,7 +252,6 @@ function jump() {
 }
 
 function beautifyJumpBtn() {
-    const jumpBtn = document.querySelector(".jump-btn");
     if (isJump) {
         jumpBtn.style.background = "silver";
         jumpBtn.style.color = "gray";
@@ -259,20 +264,16 @@ function beautifyJumpBtn() {
 }
 
 function main() {
-    const jumpBtn = document.querySelector(".jump-btn");
-    const highScoreSpan = document.querySelector("#high-score");
-    const highScore = localStorage.getItem("highScore");
-
     highScoreSpan.innerHTML = highScore || 0;
 
     jumpBtn.innerHTML = "jump";
 
     frame();
 
-    document.addEventListener('keydown', e => action(e));
+    d.addEventListener('keydown', e => action(e));
     jumpBtn.addEventListener('click', () => jump())
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+d.addEventListener("DOMContentLoaded", () => {
     main();
 });
