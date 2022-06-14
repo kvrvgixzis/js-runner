@@ -34,7 +34,20 @@ body {
 .jump-btn {
     border: none;
     height: 150px;
+
     background-color: lightgray;
+    color: #212121;
+    margin: 0;
+}
+
+.jump-btn.inactive {
+    background: silver;
+    color: gray;
+    margin: 0 3px;
+}
+
+.jump-btn.game-over {
+    color: red;
 }
 
 .jump-btn:active, 
