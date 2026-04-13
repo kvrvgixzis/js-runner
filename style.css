@@ -34,8 +34,7 @@ body {
 
 #canvas {
   width: 100%;
-  flex: 1;
-  min-height: 0;
+  aspect-ratio: 3 / 1;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   border-radius: 2px;
@@ -43,8 +42,8 @@ body {
 
 .jump-btn {
   border: none;
-  flex-shrink: 0;
-  height: 80px;
+  flex: 1;
+  min-height: 48px;
   font-family: inherit;
   font-size: 12px;
   text-transform: uppercase;
@@ -85,6 +84,7 @@ body {
   }
 
   .jump-btn {
+    flex: 0;
     height: 64px;
   }
 }
