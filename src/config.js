@@ -23,9 +23,9 @@ export const TILE = {
 
 export const PHYSICS = {
   gravity: 900,
-  jumpImpulse: -330,
-  holdGravity: 250,
-  maxJumpHoldMs: 180,
+  jumpImpulse: -340,
+  holdGravity: 120,
+  maxJumpHoldMs: 300,
   terminalVelocity: 600,
 };
 

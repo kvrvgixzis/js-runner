@@ -3,6 +3,7 @@ export class InputManager {
     this._held = new Set();
     this._justPressed = new Set();
     this._justReleased = new Set();
+    this._usingTouch = false;
 
     this._onDown = (action) => {
       if (!this._held.has(action)) {
@@ -30,31 +31,38 @@ export class InputManager {
       }
     });
 
-    // Mouse on button
+    // Mouse — ignored when touch is active (prevents synthetic events on mobile)
     button.addEventListener('mousedown', (e) => {
+      if (this._usingTouch) return;
       e.preventDefault();
       this._onDown('jump');
     });
     document.addEventListener('mouseup', () => {
+      if (this._usingTouch) return;
       if (this._held.has('jump')) {
         this._onUp('jump');
       }
     });
 
     // Touch on canvas and button
-    const touchStart = (e) => {
+    const onTouchStart = (e) => {
       e.preventDefault();
+      this._usingTouch = true;
       this._onDown('jump');
     };
-    const touchEnd = (e) => {
+    const onTouchEnd = (e) => {
       e.preventDefault();
       this._onUp('jump');
+      // Reset touch flag after synthetic mouse events would have fired
+      setTimeout(() => { this._usingTouch = false; }, 400);
     };
 
-    canvas.addEventListener('touchstart', touchStart, { passive: false });
-    canvas.addEventListener('touchend', touchEnd, { passive: false });
-    button.addEventListener('touchstart', touchStart, { passive: false });
-    button.addEventListener('touchend', touchEnd, { passive: false });
+    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+    canvas.addEventListener('touchcancel', onTouchEnd, { passive: false });
+    button.addEventListener('touchstart', onTouchStart, { passive: false });
+    button.addEventListener('touchend', onTouchEnd, { passive: false });
+    button.addEventListener('touchcancel', onTouchEnd, { passive: false });
   }
 
   isHeld(action) {
