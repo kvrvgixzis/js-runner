@@ -86,13 +86,13 @@ export function drawReverseFlash(ctx, timer) {
 
 export function drawIdleScreen(ctx) {
   ctx.fillStyle = '#212121';
-  ctx.font = '18px "Press Start 2P", monospace';
+  ctx.font = '20px "Press Start 2P", monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('runner', WORLD.width / 2, WORLD.height / 2 - 12);
+  ctx.fillText('runner', WORLD.width / 2, WORLD.height / 2 - 16);
 
-  ctx.font = '8px "Press Start 2P", monospace';
+  ctx.font = '9px "Press Start 2P", monospace';
   ctx.fillStyle = '#666';
-  ctx.fillText('press space or tap', WORLD.width / 2, WORLD.height / 2 + 16);
+  ctx.fillText('press space or tap', WORLD.width / 2, WORLD.height / 2 + 20);
   ctx.textAlign = 'left';
 }
 
@@ -101,20 +101,20 @@ export function drawGameOver(ctx, score, highScore) {
   ctx.fillRect(0, 0, WORLD.width, WORLD.height);
 
   ctx.fillStyle = '#c0392b';
-  ctx.font = '14px "Press Start 2P", monospace';
+  ctx.font = '16px "Press Start 2P", monospace';
   ctx.textAlign = 'center';
-  ctx.fillText('game over', WORLD.width / 2, WORLD.height / 2 - 16);
+  ctx.fillText('game over', WORLD.width / 2, WORLD.height / 2 - 20);
 
   ctx.fillStyle = '#212121';
-  ctx.font = '8px "Press Start 2P", monospace';
+  ctx.font = '9px "Press Start 2P", monospace';
   ctx.fillText(`score: ${score}`, WORLD.width / 2, WORLD.height / 2 + 8);
 
   if (score >= highScore && score > 0) {
     ctx.fillStyle = '#e67e22';
-    ctx.fillText('new record!', WORLD.width / 2, WORLD.height / 2 + 24);
+    ctx.fillText('new record!', WORLD.width / 2, WORLD.height / 2 + 28);
   }
 
   ctx.fillStyle = '#666';
-  ctx.fillText('press space to retry', WORLD.width / 2, WORLD.height / 2 + 44);
+  ctx.fillText('press space to retry', WORLD.width / 2, WORLD.height / 2 + 52);
   ctx.textAlign = 'left';
 }

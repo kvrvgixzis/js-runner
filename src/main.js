@@ -25,7 +25,7 @@ canvas.height = WORLD.height;
 
 // Keep canvas aspect ratio on any screen size
 function syncCanvasHeight() {
-  canvas.style.height = `${canvas.offsetWidth / 3}px`;
+  canvas.style.height = `${canvas.offsetWidth * (WORLD.height / WORLD.width)}px`;
 }
 syncCanvasHeight();
 window.addEventListener('resize', syncCanvasHeight);
