@@ -1,6 +1,6 @@
 export const WORLD = {
-  width: 300,
-  height: 250,
+  width: 600,
+  height: 200,
 };
 
 export const COLORS = {
@@ -32,8 +32,8 @@ export const PHYSICS = {
 export const OBSTACLE = {
   width: 24,
   height: 24,
-  minGap: 120,
-  maxGap: 260,
+  minGap: 140,
+  maxGap: 320,
   spawnX: WORLD.width + 40,
   collisionInset: 3,
 };

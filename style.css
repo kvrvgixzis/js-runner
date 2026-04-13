@@ -8,45 +8,52 @@ body {
   margin: 0;
   background-color: rgb(230, 228, 228);
   font-family: 'Press Start 2P', monospace;
-  font-size: 14px;
+  font-size: 12px;
   color: #212121;
   text-transform: uppercase;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  overflow: hidden;
+  height: 100dvh;
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 94%;
-  max-width: 400px;
-  margin: 16px auto 0;
+  height: 100dvh;
+  padding: 8px;
+  gap: 6px;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: 11px;
+  flex-shrink: 0;
 }
 
 #canvas {
   width: 100%;
+  flex: 1;
+  min-height: 0;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  border-radius: 2px;
 }
 
 .jump-btn {
   border: none;
-  height: 120px;
+  flex-shrink: 0;
+  height: 80px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 12px;
   text-transform: uppercase;
   background-color: lightgray;
   color: #212121;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
+  border-radius: 2px;
   transition: background-color 0.1s, color 0.1s;
 }
 
@@ -64,6 +71,20 @@ body {
 }
 
 .high-score {
-  font-size: 10px;
+  font-size: 8px;
   color: #888;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+@media (min-width: 700px) {
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 12px;
+  }
+
+  .jump-btn {
+    height: 64px;
+  }
 }
