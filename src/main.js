@@ -23,6 +23,13 @@ const jumpButton = document.querySelector('.jump-btn');
 canvas.width = WORLD.width;
 canvas.height = WORLD.height;
 
+// Keep canvas aspect ratio on any screen size
+function syncCanvasHeight() {
+  canvas.style.height = `${canvas.offsetWidth / 3}px`;
+}
+syncCanvasHeight();
+window.addEventListener('resize', syncCanvasHeight);
+
 const state = new GameState();
 const input = new InputManager(canvas, jumpButton);
 
