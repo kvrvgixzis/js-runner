@@ -18,6 +18,8 @@ export class GameState {
     };
 
     this.obstacles = [];
+    this.particles = [];
+    this.screenShake = 0;
     this.score = 0;
     this.speed = PROGRESSION.startSpeed;
     this.highScore = this.highScore ?? this._loadHighScore();

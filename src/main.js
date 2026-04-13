@@ -8,6 +8,7 @@ import {
   drawForeground,
   drawHero,
   drawObstacles,
+  drawParticles,
   drawReverseFlash,
   drawIdleScreen,
   drawGameOver,
@@ -94,11 +95,26 @@ function updatePlaying(dt) {
     state.reverseFlashTimer -= dt;
   }
 
+  // Particles
+  updateParticles(dt);
+
   // UI
   scoreSpan.textContent = state.score;
 }
 
+function updateParticles(dt) {
+  const particles = state.particles;
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
 function updateGameOver() {
+  updateParticles(1 / 60);
   if (input.wasPressed('jump')) {
     state.reset();
     jumpButton.textContent = 'start';
@@ -108,6 +124,7 @@ function updateGameOver() {
 
 function gameOver() {
   state.phase = 'gameOver';
+  state.screenShake = 0.3;
   state.saveHighScore();
   highScoreSpan.textContent = state.highScore;
   jumpButton.textContent = 'retry';
@@ -160,21 +177,36 @@ function reverseGravity() {
 }
 
 function render() {
+  // Screen shake
+  ctx.save();
+  if (state.screenShake > 0) {
+    const intensity = state.screenShake * 12;
+    ctx.translate(
+      (Math.random() - 0.5) * intensity,
+      (Math.random() - 0.5) * intensity,
+    );
+    state.screenShake -= 1 / 60;
+  }
+
   drawBackground(ctx);
   drawForeground(ctx, state.tiles, state.isReversed);
 
   if (state.phase === 'idle') {
     drawIdleScreen(ctx);
+    ctx.restore();
     return;
   }
 
   drawObstacles(ctx, state.obstacles);
   drawHero(ctx, state.hero);
+  drawParticles(ctx, state.particles);
   drawReverseFlash(ctx, state.reverseFlashTimer);
 
   if (state.phase === 'gameOver') {
     drawGameOver(ctx, state.score, state.highScore);
   }
+
+  ctx.restore();
 }
 
 // Init

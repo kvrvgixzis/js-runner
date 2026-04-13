@@ -40,9 +40,8 @@ export function checkBounds(hero, state) {
   const ceilingY = state.heroCeilingY;
 
   if (state.isReversed) {
-    // Reversed: ceiling is "ground" (top), floor is ceiling (bottom)
     if (hero.y <= ceilingY) {
-      // Hit the "ground" (ceiling in reversed mode)
+      if (!hero.onGround && Math.abs(hero.vy) > 50) spawnDust(state, hero.x + HERO.size / 2, ceilingY + HERO.size);
       hero.y = ceilingY;
       hero.vy = 0;
       hero.onGround = true;
@@ -53,8 +52,8 @@ export function checkBounds(hero, state) {
       hero.vy = 0;
     }
   } else {
-    // Normal: ground is bottom
     if (hero.y >= groundY) {
+      if (!hero.onGround && Math.abs(hero.vy) > 50) spawnDust(state, hero.x + HERO.size / 2, groundY);
       hero.y = groundY;
       hero.vy = 0;
       hero.onGround = true;
@@ -64,6 +63,19 @@ export function checkBounds(hero, state) {
       hero.y = ceilingY;
       hero.vy = 0;
     }
+  }
+}
+
+function spawnDust(state, x, y) {
+  for (let i = 0; i < 5; i++) {
+    state.particles.push({
+      x: x + (Math.random() - 0.5) * 16,
+      y,
+      vx: (Math.random() - 0.5) * 60,
+      vy: -Math.random() * 40 - 10,
+      life: 0.3 + Math.random() * 0.2,
+      size: 2 + Math.random() * 2,
+    });
   }
 }
 

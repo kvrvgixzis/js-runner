@@ -26,25 +26,35 @@ export function drawForeground(ctx, tiles, isReversed) {
 
 export function drawHero(ctx, hero) {
   const size = HERO.size;
-  const { x, y } = hero;
+  const { x, y, vy, onGround } = hero;
+
+  // Squash & stretch based on vertical velocity
+  const stretch = Math.min(Math.abs(vy) / 400, 0.3);
+  const scaleX = onGround ? 1 + stretch * 0.5 : 1 - stretch;
+  const scaleY = onGround ? 1 - stretch * 0.5 : 1 + stretch;
+  const drawW = size * scaleX;
+  const drawH = size * scaleY;
+  const drawX = x + (size - drawW) / 2;
+  const drawY = y + (size - drawH);
 
   // Body
   ctx.fillStyle = COLORS.hero;
-  ctx.fillRect(x, y, size, size);
+  ctx.fillRect(drawX, drawY, drawW, drawH);
 
   // Eye (white square)
-  const eyeSize = Math.round(size * 0.35);
-  const eyeX = x + size - eyeSize - 2;
-  const eyeY = y + 3;
+  const eyeSize = Math.round(drawW * 0.35);
+  const eyeX = drawX + drawW - eyeSize - 2;
+  const eyeY = drawY + 2;
   ctx.fillStyle = COLORS.heroEye;
   ctx.fillRect(eyeX, eyeY, eyeSize, eyeSize);
 
-  // Pupil
+  // Pupil — follows vertical velocity
   const pupilSize = Math.round(eyeSize * 0.5);
+  const pupilOffsetY = Math.round(Math.max(-1, Math.min(1, vy / 200)) * (eyeSize - pupilSize));
   ctx.fillStyle = COLORS.heroPupil;
   ctx.fillRect(
     eyeX + eyeSize - pupilSize - 1,
-    eyeY + eyeSize - pupilSize - 1,
+    eyeY + Math.max(0, Math.min(eyeSize - pupilSize, (eyeSize - pupilSize) / 2 + pupilOffsetY)),
     pupilSize,
     pupilSize,
   );
@@ -57,8 +67,14 @@ export function drawObstacles(ctx, obstacles) {
   }
 }
 
-export function drawScore(ctx, score) {
-  // Score is rendered in the DOM, not on canvas
+export function drawParticles(ctx, particles) {
+  ctx.fillStyle = '#999';
+  for (const p of particles) {
+    const alpha = Math.min(p.life / 0.15, 1);
+    ctx.globalAlpha = alpha;
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+  }
+  ctx.globalAlpha = 1;
 }
 
 export function drawReverseFlash(ctx, timer) {
