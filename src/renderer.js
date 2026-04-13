@@ -10,7 +10,9 @@ export function drawForeground(ctx, tiles, isReversed) {
 
   for (let i = 0; i < tiles.length; i++) {
     const tile = tiles[i];
-    const color = COLORS.foreground[i % 2];
+    // Color based on world position, not array index
+    const colorIdx = Math.round(tile.x / tileSize) & 1;
+    const color = COLORS.foreground[colorIdx];
 
     // Bottom tiles (floor)
     ctx.fillStyle = isReversed ? COLORS.background : color;

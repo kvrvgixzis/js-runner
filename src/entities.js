@@ -1,17 +1,13 @@
 import { OBSTACLE, HERO, WORLD, TILE, GROUND_Y } from './config.js';
 
 export function createObstacle(x, isReversed) {
+  const h = OBSTACLE.minHeight + Math.floor(Math.random() * (OBSTACLE.maxHeight - OBSTACLE.minHeight + 1));
+  const w = OBSTACLE.width;
   const y = isReversed
     ? TILE.size
-    : GROUND_Y - OBSTACLE.height;
+    : GROUND_Y - h;
 
-  return {
-    x,
-    y,
-    w: OBSTACLE.width,
-    h: OBSTACLE.height,
-    scored: false,
-  };
+  return { x, y, w, h, scored: false };
 }
 
 export function spawnInitialObstacle(state) {

@@ -31,18 +31,19 @@ export const PHYSICS = {
 
 export const OBSTACLE = {
   width: 24,
-  height: 24,
-  minGap: 140,
-  maxGap: 320,
+  minHeight: 24,
+  maxHeight: 48,
+  minGap: 90,
+  maxGap: 200,
   spawnX: WORLD.width + 40,
   collisionInset: 3,
 };
 
 export const PROGRESSION = {
-  speedUpEvery: 5,
-  speedStep: 12,
-  startSpeed: 120,
-  maxSpeed: 280,
+  speedUpEvery: 3,
+  speedStep: 14,
+  startSpeed: 160,
+  maxSpeed: 360,
   reverseGravityEvery: 20,
 };
 
